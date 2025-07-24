@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cours 04 - Formulaires d'Authentification avec React Hook Form</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="./01-installation.html">Installation</a></li>
+      <li><a href="./02-api-frontend.html">API & Axios</a></li>
+      <li><a href="./03-hooks.html">Hooks</a></li>
+      <li><a href="./04-formulaires.html">Formulaires</a></li>
+      <li><a href="./05-protection.html">protection </a></li>
+      <li><a href="./06-Authentification-côté-client.html">Auth Client</a></li>
+      <li><a href="./07 – gestion des rôles et autorisations (admin, user, modérateur).html">Rôles & Autorisations</a></li>
+      <li><a href="./08-Bonus-UI-UX.html">Bonus Sécurité</a></li>
+    </ul>
+  </nav>
+  <h1>Cours 04 : Formulaires d'Authentification avec React Hook Form</h1>
+
+  <section>
+    <h2>1. Installation de React Hook Form</h2>
+    <p>Pour créer des formulaires robustes avec validation intégrée, on installe <code>react-hook-form</code> :</p>
+    <pre><code>npm install react-hook-form</code></pre>
+  </section>
+
+  <section>
+    <h2>2. Formulaire d'inscription</h2>
+    <pre><code>import { useForm } from 'react-hook-form';
+import API from '../api';
+
+function RegisterForm() {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      await API.post('/register', data);
+      alert('Inscription réussie');
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input placeholder="Nom" {...register('name', { required: 'Nom requis' })} />
+      {errors.name && <span>{errors.name.message}</span>}
+
+      <input placeholder="Email" {...register('email', { required: 'Email requis' })} />
+      {errors.email && <span>{errors.email.message}</span>}
+
+      <input type="password" placeholder="Mot de passe" {...register('password', { required: 'Mot de passe requis' })} />
+      {errors.password && <span>{errors.password.message}</span>}
+
+      <button type="submit">S'inscrire</button>
+    </form>
+  );
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>3. Formulaire de connexion</h2>
+    <pre><code>import { useForm } from 'react-hook-form';
+import API from '../api';
+import { useAuth } from '../context/authContext';
+import { useNavigate } from 'react-router-dom';
+
+function LoginForm() {
+  const { register, handleSubmit } = useForm();
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const onSubmit = async (data) => {
+    try {
+      const res = await API.post('/login', data);
+      setUser(res.data.user);
+      navigate('/dashboard');
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input placeholder="Email" {...register('email', { required: true })} />
+      <input type="password" placeholder="Mot de passe" {...register('password', { required: true })} />
+      <button type="submit">Se connecter</button>
+    </form>
+  );
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>4. Formulaire de mot de passe oublié</h2>
+    <pre><code>import { useForm } from 'react-hook-form';
+import API from '../api';
+
+function ForgotPasswordForm() {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      await API.post('/forgot-password', data);
+      alert('Un lien de réinitialisation a été envoyé.');
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input placeholder="Email" {...register('email', { required: true })} />
+      <button type="submit">Envoyer</button>
+    </form>
+  );
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>5. Formulaire de réinitialisation de mot de passe</h2>
+    <pre><code>import { useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
+import API from '../api';
+
+function ResetPasswordForm() {
+  const { token } = useParams();
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      await API.post(`/reset-password/${token}`, data);
+      alert('Mot de passe réinitialisé avec succès');
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input type="password" placeholder="Nouveau mot de passe" {...register('password', { required: true })} />
+      <button type="submit">Réinitialiser</button>
+    </form>
+  );
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>Résumé</h2>
+    <ul>
+      <li>Utilise <code>react-hook-form</code> pour gérer les champs, la validation et les erreurs.</li>
+      <li>Chaque formulaire appelle les routes de ton backend selon le type d'action.</li>
+      <li>Les messages d'erreur sont affichés en cas d'échec de l'appel API.</li>
+    </ul>
+    <p>La prochaine étape est la gestion de la vérification email.</p>
+  </section>
+</body>
+</html>

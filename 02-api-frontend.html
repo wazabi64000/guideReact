@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cours 02 - Base URL API & Communication avec le Backend</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="./01-installation.html">Installation</a></li>
+      <li><a href="./02-api-frontend.html">API & Axios</a></li>
+      <li><a href="./03-hooks.html">Hooks</a></li>
+      <li><a href="./04-formulaires.html">Formulaires</a></li>
+      <li><a href="./05-protection.html">protection </a></li>
+      <li><a href="./06-Authentification-côté-client.html">Auth Client</a></li>
+      <li><a href="./07 – gestion des rôles et autorisations (admin, user, modérateur).html">Rôles & Autorisations</a></li>
+      <li><a href="./08-Bonus-UI-UX.html">Bonus Sécurité</a></li>
+    </ul>
+  </nav>
+  <h1>Cours 02 : Base URL API & Communication avec le Backend</h1>
+
+  <section>
+    <h2>1. Comprendre la base URL et son importance</h2>
+    <p>
+      La base URL est la racine de toutes les requêtes HTTP vers ton backend.
+      Elle permet de ne pas répéter l’adresse complète à chaque appel, ce qui facilite la maintenance.
+    </p>
+    <p>
+      Par exemple, si ton backend est accessible via :
+      <code>https://ton-backend-url-sur-render.com/api/auth</code>,
+      toutes les routes d'authentification s'y ajoutent (ex : <code>/register</code>, <code>/login</code>, etc.).
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Création d’un service API avec Axios</h2>
+    <p>
+      Pour centraliser les appels, on crée un service Axios qui utilise cette base URL.
+      Cela facilite les appels, la gestion des erreurs et la configuration.
+    </p>
+    <h3>Code complet du service API (fichier <code>src/api.js</code>) :</h3>
+    <pre><code>import axios from 'axios';
+
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/auth',
+  withCredentials: true, // permet d’envoyer les cookies (JWT httpOnly)
+});
+
+API.interceptors.response.use(
+  response =&gt; response,
+  error =&gt; {
+    // Gestion centralisée des erreurs API
+    if (error.response) {
+      console.error('Erreur API:', error.response.status, error.response.data);
+      return Promise.reject(error.response.data);
+    } else if (error.request) {
+      console.error('Aucune réponse reçue du backend');
+      return Promise.reject({ message: 'Backend non accessible' });
+    } else {
+      console.error('Erreur lors de la requête', error.message);
+      return Promise.reject({ message: error.message });
+    }
+  }
+);
+
+export default API;</code></pre>
+    <p>
+      Ici, nous utilisons un <em>intercepteur</em> pour gérer toutes les erreurs API au même endroit.
+    </p>
+  </section>
+
+  <section>
+    <h2>3. Gestion des erreurs et réponses</h2>
+    <p>
+      Lors d’un appel API, plusieurs cas d’erreur peuvent survenir :
+    </p>
+    <ul>
+      <li><strong>Erreur serveur (500, 400, 401...)</strong> : l’API renvoie un code d’erreur et un message.</li>
+      <li><strong>Aucune réponse</strong> : problème réseau ou backend indisponible.</li>
+      <li><strong>Erreur côté client</strong> : problème dans la requête (exemple : mauvais format).</li>
+    </ul>
+    <p>
+      Le service Axios gère cela et transmet un message clair pour que le frontend puisse afficher un feedback adapté.
+    </p>
+  </section>
+
+  <section>
+    <h2>4. Exemple d’appel simple pour tester la connexion au backend</h2>
+    <p>
+      Pour vérifier que la communication fonctionne, on peut créer une fonction qui appelle une route simple, par exemple <code>/test</code>.
+    </p>
+    <pre><code>import API from './api';
+
+export async function testBackendConnection() {
+  try {
+    const response = await API.get('/test');
+    console.log('Réponse backend:', response.data);
+  } catch (error) {
+    console.error('Erreur lors du test backend:', error.message || error);
+  }
+}</code></pre>
+    <p>Tu peux appeler cette fonction dans un composant React pour tester la connexion.</p>
+  </section>
+
+  <section>
+    <h2>5. Explication des routes backend disponibles (extrait du backend fourni)</h2>
+    <p>Voici un résumé des routes importantes que tu peux utiliser :</p>
+    <ul>
+      <li><code>POST /register</code> : création d’un nouvel utilisateur.</li>
+      <li><code>POST /login</code> : connexion d’un utilisateur.</li>
+      <li><code>POST /forgot-password</code> : demande de réinitialisation du mot de passe.</li>
+      <li><code>POST /reset-password</code> : réinitialisation du mot de passe avec token.</li>
+      <li><code>GET /verify-email/:token</code> : vérification du mail via token.</li>
+      <li><code>POST /resend-verification</code> : renvoi du mail de validation.</li>
+      <li><code>GET /user-profile</code> : accès au profil utilisateur (route protégée).</li>
+    </ul>
+    <p>
+      Ces routes seront utilisées dans les prochains cours pour construire le frontend complet.
+    </p>
+  </section>
+
+  <section>
+    <h2>6. Résumé</h2>
+    <p>
+      Tu as maintenant un service API centralisé avec Axios qui utilise la base URL définie dans les variables d’environnement.
+      Ce service gère aussi la gestion des erreurs pour que le frontend puisse réagir correctement.
+    </p>
+    <p>
+      Nous avons vu les principales routes backend qui vont être exploitées dans le projet.
+      Tu es prêt pour commencer à utiliser React Hooks et à créer les formulaires de connexion et d’inscription.
+    </p>
+  </section>
+</body>
+</html>

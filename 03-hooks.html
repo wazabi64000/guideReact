@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cours 03 - React Hooks Essentiels</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="./01-installation.html">Installation</a></li>
+      <li><a href="./02-api-frontend.html">API & Axios</a></li>
+      <li><a href="./03-hooks.html">Hooks</a></li>
+      <li><a href="./04-formulaires.html">Formulaires</a></li>
+      <li><a href="./05-protection.html">protection </a></li>
+      <li><a href="./06-Authentification-côté-client.html">Auth Client</a></li>
+      <li><a href="./07 – gestion des rôles et autorisations (admin, user, modérateur).html">Rôles & Autorisations</a></li>
+      <li><a href="./08-Bonus-UI-UX.html">Bonus Sécurité</a></li>
+    </ul>
+  </nav>
+  <h1>Cours 03 : React Hooks Essentiels</h1>
+
+  <section>
+    <h2>1. useState : gérer l'état local</h2>
+    <p>Le hook <code>useState</code> permet de déclarer une variable d'état dans un composant fonctionnel.</p>
+    <pre><code>import { useState } from 'react';
+
+function Exemple() {
+  const [nom, setNom] = useState('');
+
+  return (
+    &lt;input value={nom} onChange={(e) =&gt; setNom(e.target.value)} /&gt;
+  );
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>2. useEffect : effets de bord</h2>
+    <p>Le hook <code>useEffect</code> permet d'exécuter une action après le rendu (ou quand certaines dépendances changent).</p>
+    <pre><code>import { useEffect } from 'react';
+
+function Exemple() {
+  useEffect(() =&gt; {
+    console.log('Composant monté');
+  }, []); // [] signifie que cela s'exécute une seule fois
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>3. useContext : partager un état global</h2>
+    <p>Utilisé pour partager des données entre composants sans passer les props manuellement à chaque niveau.</p>
+    <pre><code>// authContext.js
+import { createContext, useContext, useState } from 'react';
+
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+
+  return (
+    &lt;AuthContext.Provider value={{ user, setUser }}&gt;
+      {children}
+    &lt;/AuthContext.Provider&gt;
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>4. useNavigate : navigation programmatique</h2>
+    <p>Proposé par <code>react-router-dom</code>, permet de rediriger l'utilisateur dans le code JS.</p>
+    <pre><code>import { useNavigate } from 'react-router-dom';
+
+function Login() {
+  const navigate = useNavigate();
+
+  const handleLogin = () =&gt; {
+    // après connexion réussie
+    navigate('/dashboard');
+  };
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>5. Exemple concret combiné</h2>
+    <p>Utilisons les hooks ensemble dans une page de connexion :</p>
+    <pre><code>import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import API from '../api';
+import { useAuth } from '../context/authContext';
+
+function LoginForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) =&gt; {
+    e.preventDefault();
+    try {
+      const res = await API.post('/login', { email, password });
+      setUser(res.data.user);
+      navigate('/dashboard');
+    } catch (err) {
+      alert(err.message || 'Erreur de connexion');
+    }
+  };
+
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      &lt;input value={email} onChange={e =&gt; setEmail(e.target.value)} placeholder="Email" /&gt;
+      &lt;input type="password" value={password} onChange={e =&gt; setPassword(e.target.value)} placeholder="Mot de passe" /&gt;
+      &lt;button type="submit"&gt;Connexion&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>Résumé</h2>
+    <ul>
+      <li><code>useState</code> : pour les champs de formulaire</li>
+      <li><code>useEffect</code> : pour charger des données à l'affichage</li>
+      <li><code>useContext</code> : pour garder l'utilisateur connecté</li>
+      <li><code>useNavigate</code> : pour rediriger après une action</li>
+    </ul>
+    <p>Ces hooks sont essentiels pour construire des formulaires d'authentification dynamiques, interactifs et reliés à ton backend.</p>
+  </section>
+</body>
+</html>

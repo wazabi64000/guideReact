@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bonus - Sécurité, bonnes pratiques et UX</title>
+   <link rel="stylesheet" href="style.css">
+ 
+</head>
+<body>
+    <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="./01-installation.html">Installation</a></li>
+      <li><a href="./02-api-frontend.html">API & Axios</a></li>
+      <li><a href="./03-hooks.html">Hooks</a></li>
+      <li><a href="./04-formulaires.html">Formulaires</a></li>
+      <li><a href="./05-protection.html">protection </a></li>
+      <li><a href="./06-Authentification-côté-client.html">Auth Client</a></li>
+      <li><a href="./07 – gestion des rôles et autorisations (admin, user, modérateur).html">Rôles & Autorisations</a></li>
+      <li><a href="./08-Bonus-UI-UX.html">Bonus Sécurité</a></li>
+    </ul>
+  </nav>
+  <h1>Bonus : Sécurité, bonnes pratiques et UX</h1>
+
+  <p>Dans ce module bonus, nous abordons les recommandations essentielles pour améliorer la sécurité, les performances, la maintenabilité et l’expérience utilisateur d’une application React connectée à un backend Node/Express.</p>
+
+  <h2>1. Sécurité côté client</h2>
+  <ul>
+    <li>Ne jamais stocker le token JWT dans <code>localStorage</code> ou <code>sessionStorage</code>. Préfère les cookies HTTP-only, gérés côté backend.</li>
+    <li>Échapper tous les champs d'entrée utilisateurs pour éviter les failles XSS.</li>
+    <li>Utiliser des bibliothèques sécurisées pour les formulaires comme <code>react-hook-form</code>.</li>
+    <li>Vérifier systématiquement que les données récupérées ne sont pas <code>null</code> ou <code>undefined</code> avant affichage.</li>
+  </ul>
+
+  <h2>2. Sécurité côté backend</h2>
+  <ul>
+    <li>Vérifier tous les tokens JWT avec une clé secrète robuste.</li>
+    <li>Limiter les requêtes avec un middleware <code>rate-limiter</code> (ex : <code>express-rate-limit</code>).</li>
+    <li>Valider toutes les entrées utilisateurs avec <code>Joi</code>, <code>Zod</code> ou <code>express-validator</code>.</li>
+    <li>Protéger les routes sensibles avec des middlewares <code>isAuthenticated</code> et <code>authorize</code>.</li>
+  </ul>
+
+  <h2>3. Prévention CSRF</h2>
+  <p>Si tu utilises les cookies pour authentifier tes utilisateurs, active la protection CSRF :</p>
+  <ul>
+    <li>Utiliser un token anti-CSRF synchronisé avec les requêtes HTTP (via en-tête personnalisé).</li>
+    <li>Configurer les cookies avec <code>sameSite</code> et <code>secure</code>.</li>
+  </ul>
+
+  <h2>4. Bonnes pratiques de code</h2>
+  <ul>
+    <li>Séparer clairement les fichiers : <code>services/api.js</code>, <code>context/AuthContext.jsx</code>, <code>components/</code>, etc.</li>
+    <li>Utiliser un gestionnaire d’erreurs centralisé côté frontend (ex : interceptor axios global).</li>
+    <li>Créer un fichier <code>routes.jsx</code> pour gérer la navigation centralement.</li>
+    <li>Créer des constantes pour les rôles, les chemins, les messages d’erreur.</li>
+  </ul>
+
+  <h2>5. Amélioration de l’expérience utilisateur</h2>
+  <ul>
+    <li>Afficher des messages clairs en cas d’erreur (ex : identifiants invalides, lien expiré).</li>
+    <li>Utiliser des <code>loaders</code> ou <code>squelettes</code> pendant le chargement.</li>
+    <li>Rediriger automatiquement l’utilisateur vers la dernière page visitée après login.</li>
+    <li>Afficher un message de confirmation pour les actions sensibles (ex : suppression de compte).</li>
+  </ul>
+
+  <h2>6. Accessibilité et responsivité</h2>
+  <ul>
+    <li>Utiliser des <code>label</code> et <code>aria-*</code> pour les formulaires.</li>
+    <li>Tester la navigation clavier et les lecteurs d’écran.</li>
+    <li>Prévoir un design responsive mobile-first.</li>
+  </ul>
+
+  <h2>7. Test et audit</h2>
+  <ul>
+    <li>Utiliser <code>React Testing Library</code> ou <code>Cypress</code> pour tester les pages clés.</li>
+    <li>Analyser les performances avec <code>Lighthouse</code> (devtools Chrome).</li>
+    <li>Auditer les failles potentielles avec <code>npm audit</code> et <code>OWASP ZAP</code>.</li>
+  </ul>
+
+  <h2>Conclusion</h2>
+  <p>Une application sécurisée et fiable repose autant sur une bonne architecture que sur l’attention aux détails. En suivant ces recommandations, tu offres une base robuste, durable et agréable à utiliser pour tous tes utilisateurs.</p>
+</body>
+</html>

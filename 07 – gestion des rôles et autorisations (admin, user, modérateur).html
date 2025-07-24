@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cours 07 - Gestion des rôles et autorisations dans une application React</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="./01-installation.html">Installation</a></li>
+      <li><a href="./02-api-frontend.html">API & Axios</a></li>
+      <li><a href="./03-hooks.html">Hooks</a></li>
+      <li><a href="./04-formulaires.html">Formulaires</a></li>
+      <li><a href="./05-protection.html">protection </a></li>
+      <li><a href="./06-Authentification-côté-client.html">Auth Client</a></li>
+      <li><a href="./07 – gestion des rôles et autorisations (admin, user, modérateur).html">Rôles & Autorisations</a></li>
+      <li><a href="./08-Bonus-UI-UX.html">Bonus Sécurité</a></li>
+    </ul>
+  </nav>
+  <h1>Cours 07 : Gestion des rôles et autorisations dans une application React</h1>
+
+  <p>Dans ce cours, nous allons mettre en place un système de gestion des rôles (admin, user, modérateur) dans une application React, en lien direct avec ton backend existant.</p>
+
+  <h2>1. Rappel côté backend</h2>
+  <p>Ton backend expose l'utilisateur connecté avec un champ <code>role</code> depuis l’endpoint <code>/me</code>. Exemple :</p>
+  <pre><code>{
+  "id": 42,
+  "email": "admin@example.com",
+  "role": "admin"
+}</code></pre>
+  <p>Nous allons nous appuyer sur cette information pour adapter dynamiquement l’interface et restreindre les accès à certaines pages.</p>
+
+  <h2>2. Intégration du rôle dans le contexte Auth</h2>
+  <p>Si ce n’est pas déjà fait, assure-toi que ton <strong>AuthContext</strong> stocke et expose l’objet <code>user</code>, qui contient le rôle :</p>
+  <pre><code>const { user } = useAuth();
+console.log(user.role); // 'admin', 'user', 'moderator'</code></pre>
+
+  <h2>3. Affichage conditionnel en fonction du rôle</h2>
+  <p>Tu peux afficher ou masquer des composants selon le rôle :</p>
+  <pre><code>{user?.role === 'admin' &amp;&amp; (
+  &lt;button&gt;Accès admin&lt;/button&gt;
+)}</code></pre>
+
+  <h2>4. Création d’un composant de protection : RoleGuard</h2>
+  <p>Ce composant permet de restreindre une page ou une section à un ou plusieurs rôles :</p>
+  <pre><code>import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
+
+export function RoleGuard({ allowedRoles, children }) {
+  const { user } = useAuth();
+  if (!user || !allowedRoles.includes(user.role)) {
+    return &lt;Navigate to="/unauthorized" replace /&gt;;
+  }
+  return children;
+}</code></pre>
+
+  <h2>5. Intégration dans React Router</h2>
+  <p>Tu peux maintenant sécuriser une route complète :</p>
+  <pre><code>&lt;Route
+  path="/admin"
+  element={
+    &lt;RoleGuard allowedRoles={["admin"]}&gt;
+      &lt;AdminDashboard /&gt;
+    &lt;/RoleGuard&gt;
+  }
+/&gt;</code></pre>
+
+  <h2>6. Page Unauthorized</h2>
+  <p>Crée une page pour afficher un message en cas d’accès refusé :</p>
+  <pre><code>function Unauthorized() {
+  return &lt;h2&gt;Accès refusé : vous n'avez pas les permissions nécessaires.&lt;/h2&gt;;
+}
+export default Unauthorized;</code></pre>
+
+  <h2>7. Exemple de panneau admin/modérateur</h2>
+  <p>Dans un tableau de bord, tu peux afficher des sections selon le rôle :</p>
+  <pre><code>{user?.role === 'admin' &amp;&amp; &lt;AdminPanel /&gt;}
+{user?.role === 'moderator' &amp;&amp; &lt;ModerationPanel /&gt;}</code></pre>
+
+  <h2>8. Bonus : Sécuriser aussi côté backend</h2>
+  <p>Ne pas oublier de <strong>vérifier les rôles côté backend</strong> via un middleware type <code>authorize()</code>. Ne jamais se baser uniquement sur le frontend pour la sécurité.</p>
+
+  <h2>Conclusion</h2>
+  <ul>
+    <li>Ton application connaît le rôle de l’utilisateur via <code>/me</code></li>
+    <li>Tu peux afficher ou cacher du contenu avec <code>user.role</code></li>
+    <li><code>RoleGuard</code> permet de sécuriser les routes selon le rôle</li>
+    <li>Les vérifications doivent aussi être implémentées dans ton backend</li>
+  </ul>
+
+  <p>Tu es maintenant capable de gérer plusieurs niveaux d'accès dans ton interface : admin, user classique, modérateur, etc.</p>
+</body>

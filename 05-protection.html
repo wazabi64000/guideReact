@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cours 05 - Vérification Email et Renvoi</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="./01-installation.html">Installation</a></li>
+      <li><a href="./02-api-frontend.html">API & Axios</a></li>
+      <li><a href="./03-hooks.html">Hooks</a></li>
+      <li><a href="./04-formulaires.html">Formulaires</a></li>
+      <li><a href="./05-protection.html">protection </a></li>
+      <li><a href="./06-Authentification-côté-client.html">Auth Client</a></li>
+      <li><a href="./07 – gestion des rôles et autorisations (admin, user, modérateur).html">Rôles & Autorisations</a></li>
+      <li><a href="./08-Bonus-UI-UX.html">Bonus Sécurité</a></li>
+    </ul>
+  </nav>
+  <h1>Cours 05 : Vérification de l'e-mail et renvoi du lien de validation</h1>
+
+  <section>
+    <h2>1. Fonctionnement de la vérification email</h2>
+    <p>Ton backend envoie un lien de confirmation lors de l'inscription, contenant un token signé. L'utilisateur doit cliquer sur ce lien pour activer son compte.</p>
+    <p>Exemple de lien envoyé : <code>https://ton-app/render/verify-email/:token</code></p>
+  </section>
+
+  <section>
+    <h2>2. Page de confirmation d'email</h2>
+    <p>Cette page vérifie le token passé dans l'URL en appelant l'API <code>/verify-email/:token</code>.</p>
+    <pre><code>import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import API from '../api';
+
+function EmailVerificationPage() {
+  const { token } = useParams();
+  const [message, setMessage] = useState('Vérification en cours...');
+
+  useEffect(() => {
+    async function verifyEmail() {
+      try {
+        await API.get(`/verify-email/${token}`);
+        setMessage("Email vérifié avec succès. Vous pouvez vous connecter.");
+      } catch (err) {
+        setMessage("Échec de la vérification. Le lien a peut-être expiré.");
+      }
+    }
+    verifyEmail();
+  }, [token]);
+
+  return <p>{message}</p>;
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>3. Page de renvoi du lien de vérification</h2>
+    <p>Si l'utilisateur n'a pas reçu ou a perdu l'email, il peut en demander un nouveau.</p>
+    <pre><code>import { useForm } from 'react-hook-form';
+import API from '../api';
+
+function ResendVerificationForm() {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      await API.post('/resend-verification-email', data);
+      alert('Un nouveau lien a été envoyé.');
+    } catch (error) {
+      alert("Erreur : " + error.message);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input placeholder="Email" {...register('email', { required: true })} />
+      <button type="submit">Renvoyer le lien</button>
+    </form>
+  );
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>4. Backend concerné</h2>
+    <ul>
+      <li><code>POST /resend-verification-email</code> : renvoie le lien</li>
+      <li><code>GET /verify-email/:token</code> : vérifie le compte</li>
+    </ul>
+    <p>Ces routes doivent être déjà présentes dans ton backend. Le frontend ne fait que les consommer.</p>
+  </section>
+
+  <section>
+    <h2>Résumé</h2>
+    <ul>
+      <li>Un token est envoyé à l'utilisateur par e-mail</li>
+      <li>Il est vérifié via <code>/verify-email/:token</code></li>
+      <li>Un formulaire permet de renvoyer le lien si besoin</li>
+    </ul>
+    <p>Le cours suivant traitera de la gestion de l'authentification côté client (JWT, contexte, routes protégées).</p>
+  </section>
+</body>
+</html>

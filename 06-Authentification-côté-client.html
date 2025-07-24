@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cours 06 - Authentification côté client</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="./01-installation.html">Installation</a></li>
+      <li><a href="./02-api-frontend.html">API & Axios</a></li>
+      <li><a href="./03-hooks.html">Hooks</a></li>
+      <li><a href="./04-formulaires.html">Formulaires</a></li>
+      <li><a href="./05-protection.html">protection </a></li>
+      <li><a href="./06-Authentification-côté-client.html">Auth Client</a></li>
+      <li><a href="./07 – gestion des rôles et autorisations (admin, user, modérateur).html">Rôles & Autorisations</a></li>
+      <li><a href="./08-Bonus-UI-UX.html">Bonus Sécurité</a></li>
+    </ul>
+  </nav>
+  <h1>Cours 06 : Authentification côté client</h1>
+
+  <section>
+    <h2>1. Stockage du token JWT</h2>
+    <p>Ton backend utilise des cookies httpOnly pour stocker les tokens. Côté client, on ne peut pas accéder au token depuis JavaScript, ce qui est une bonne pratique de sécurité.</p>
+    <p>Lors de la connexion, la session est créée et le cookie est automatiquement géré par le navigateur.</p>
+  </section>
+
+  <section>
+    <h2>2. Création d'un contexte d'authentification</h2>
+    <p>On utilise <code>useContext</code> pour partager l'état utilisateur dans toute l'application.</p>
+    <pre><code>import { createContext, useContext, useEffect, useState } from 'react';
+import API from '../api';
+
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await API.get('/me');
+        setUser(res.data);
+      } catch {
+        setUser(null);
+      }
+    }
+    fetchUser();
+  }, []);
+
+  const logout = async () => {
+    await API.post('/logout');
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);</code></pre>
+  </section>
+
+  <section>
+    <h2>3. Protéger les routes privées</h2>
+    <p>On crée un composant qui vérifie si l'utilisateur est connecté avant d'afficher une page privée.</p>
+    <pre><code>import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
+function PrivateRoute({ children }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" />;
+  return children;
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>4. Déconnexion</h2>
+    <p>Pour se déconnecter, on appelle le backend et on réinitialise le contexte utilisateur.</p>
+    <pre><code>const { logout } = useAuth();
+<button onClick={logout}>Se déconnecter</button></code></pre>
+  </section>
+
+  <section>
+    <h2>5. Gestion des erreurs d'authentification</h2>
+    <p>Si le token est expiré ou invalide, les routes privées redirigeront l'utilisateur vers la page de connexion.</p>
+    <p>On peut aussi afficher des messages d'erreur depuis le backend (401 Unauthorized, 403 Forbidden).</p>
+  </section>
+
+  <section>
+    <h2>Résumé</h2>
+    <ul>
+      <li>Le token est géré automatiquement par le navigateur (cookie httpOnly)</li>
+      <li>Le contexte React permet de suivre l'utilisateur connecté</li>
+      <li>On protège les routes en vérifiant <code>user</code> dans le contexte</li>
+      <li>On utilise <code>/me</code> pour récupérer les infos utilisateur au chargement</li>
+    </ul>
+    <p>Prochaine étape : gestion des rôles (admin, utilisateur, modérateur) côté frontend.</p>
+  </section>
+</body>
+</html>

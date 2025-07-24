@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cours 01 - Installation & Configuration React + Vite</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+    <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="./01-installation.html">Installation</a></li>
+      <li><a href="./02-api-frontend.html">API & Axios</a></li>
+      <li><a href="./03-hooks.html">Hooks</a></li>
+      <li><a href="./04-formulaires.html">Formulaires</a></li>
+      <li><a href="./05-protection.html">protection </a></li>
+      <li><a href="./06-Authentification-côté-client.html">Auth Client</a></li>
+      <li><a href="./07 – gestion des rôles et autorisations (admin, user, modérateur).html">Rôles & Autorisations</a></li>
+      <li><a href="./08-Bonus-UI-UX.html">Bonus Sécurité</a></li>
+    </ul>
+  </nav>
+  <h1>Cours 01 : Installation et configuration du projet React avec Vite</h1>
+
+  <section>
+    <h2>1. Introduction</h2>
+    <p>
+      Ce premier cours a pour objectif de mettre en place un environnement de développement React moderne avec Vite,
+      ainsi que la configuration nécessaire pour communiquer avec ton API backend via Axios.
+      Nous allons détailler chaque étape pour garantir une compréhension complète.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Installation de Vite + React</h2>
+    <p>
+      <strong>Vite</strong> est un bundler rapide, simple à configurer, idéal pour commencer un projet React moderne.
+      Voici comment créer un nouveau projet React avec Vite.
+    </p>
+    <h3>Étapes :</h3>
+    <ol>
+      <li>Ouvre ton terminal (cmd, PowerShell, bash, etc.).</li>
+      <li>Place-toi dans le dossier où tu souhaites créer le projet.</li>
+      <li>Exécute la commande suivante :</li>
+    </ol>
+    <pre><code>npm create vite@latest my-auth-app -- --template react</code></pre>
+    <p>
+      Ici, <code>my-auth-app</code> est le nom du dossier du projet. Tu peux choisir un autre nom.
+    </p>
+    <p>
+      Cette commande va créer un projet React prêt à l'emploi avec Vite.
+    </p>
+  </section>
+
+  <section>
+    <h2>3. Installer les dépendances</h2>
+    <p>Ensuite, entre dans le dossier du projet et installe les dépendances :</p>
+    <pre><code>cd my-auth-app
+npm install</code></pre>
+    <p>Cette étape télécharge toutes les librairies nécessaires au fonctionnement du projet.</p>
+  </section>
+
+  <section>
+    <h2>4. Structure du projet créé par Vite</h2>
+    <p>Voici les fichiers principaux que tu trouveras dans ton projet :</p>
+    <ul>
+      <li><code>index.html</code> : point d’entrée HTML.</li>
+      <li><code>src/main.jsx</code> : point d’entrée JavaScript / React.</li>
+      <li><code>src/App.jsx</code> : composant principal React.</li>
+      <li><code>package.json</code> : liste des dépendances et scripts npm.</li>
+      <li><code>vite.config.js</code> : configuration Vite (rarement modifiée au début).</li>
+    </ul>
+    <p>Cette organisation est simple et propre pour commencer à développer.</p>
+  </section>
+
+  <section>
+    <h2>5. Configuration des variables d’environnement</h2>
+    <p>
+      Pour connecter le frontend à ton backend, on utilise des variables d'environnement.
+      Dans Vite, ces variables doivent commencer par <code>VITE_</code>.
+    </p>
+    <h3>Création du fichier <code>.env</code></h3>
+    <pre><code>VITE_API_URL=https://ton-backend-url-sur-render.com/api/auth</code></pre>
+    <p>
+      Remplace <code>https://ton-backend-url-sur-render.com/api/auth</code> par l'URL réelle de ton API backend.
+      Ce fichier doit être à la racine du projet.
+    </p>
+    <p>Tu pourras accéder à cette variable dans ton code React via <code>import.meta.env.VITE_API_URL</code>.</p>
+  </section>
+
+  <section>
+    <h2>6. Installer et configurer Axios pour les appels API</h2>
+    <p>
+      <strong>Axios</strong> est une bibliothèque qui facilite les appels HTTP vers une API.
+      Installons-la et configurons-la pour utiliser la base URL de notre backend.
+    </p>
+    <h3>Installation</h3>
+    <pre><code>npm install axios</code></pre>
+    <h3>Création d’un fichier de service API</h3>
+    <p>
+      Dans le dossier <code>src</code>, crée un fichier <code>api.js</code> qui contiendra la configuration d’Axios.
+    </p>
+    <pre><code>import axios from 'axios';
+
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/auth',
+  withCredentials: true // Important pour envoyer les cookies (JWT stockés côté backend)
+});
+
+export default API;</code></pre>
+    <p>
+      Ici, on indique la base URL qui vient de la variable d’environnement, sinon un fallback vers localhost.
+      L’option <code>withCredentials: true</code> est nécessaire pour que le frontend envoie les cookies (comme le token JWT httpOnly).
+    </p>
+  </section>
+
+  <section>
+    <h2>7. Explication des outils et dépendances nécessaires</h2>
+    <ul>
+      <li><strong>React</strong> : bibliothèque JavaScript pour créer des interfaces utilisateur.</li>
+      <li><strong>Vite</strong> : bundler moderne rapide et simple.</li>
+      <li><strong>Axios</strong> : pour communiquer facilement avec le backend REST.</li>
+      <li><strong>Variables d’environnement</strong> : pour stocker l’URL backend sans coder en dur.</li>
+    </ul>
+    <p>
+      Ces outils forment la base moderne et efficace pour un frontend React qui communique proprement avec ton backend Express/MongoDB.
+    </p>
+  </section>
+
+  <section>
+    <h2>8. Lancement du projet</h2>
+    <p>Pour tester que tout fonctionne, lance ton projet avec :</p>
+    <pre><code>npm run dev</code></pre>
+    <p>Tu verras une URL locale (exemple : <code>http://localhost:5173</code>) où tu pourras ouvrir l’application React dans ton navigateur.</p>
+  </section>
+
+  <section>
+    <h2>9. Conclusion</h2>
+    <p>
+      Tu as maintenant un projet React configuré avec Vite, prêt à communiquer avec ton backend via Axios.
+      La prochaine étape sera de mettre en place les premiers appels API et gérer l’état utilisateur.
+    </p>
+    <p>Dans le prochain cours, nous verrons comment construire un service API complet et faire un premier test d’appel.</p>
+  </section>
+</body>
+</html>
